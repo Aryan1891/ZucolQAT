@@ -112,11 +112,26 @@ router.put('/edit_employee/:id', async (req, res) => {
   }
 });
 
-router.delete('/delete_employee/:id', async (req, res) => {
-  const { id } = req.params;
+router.delete('/delete_employee/:Eid', async (req, res) => {
+  const { Eid } = req.params; // Extract Eid from params
   try {
-    await Employee.findByIdAndDelete(id);
-    res.json({ Status: true });
+    const deletedEmployee = await Employee.findOneAndDelete({ Eid });
+    
+    if (deletedEmployee) {
+      res.json({ Status: true, Message: 'Employee deleted successfully' });
+    } else {
+      res.status(404).json({ Status: false, Error: 'Employee not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ Status: false, Error: 'Query Error', Details: err.message });
+  }
+});
+
+
+router.get('/department_count', async (req, res) => {
+  try {
+    const count = await Category.countDocuments();
+    res.json({ Status: true, Result: { department: count } });
   } catch (err) {
     res.json({ Status: false, Error: 'Query Error' });
   }
